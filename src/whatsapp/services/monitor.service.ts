@@ -326,24 +326,19 @@ export class WAMonitoringService {
       };
       try {
         this.waInstances[instanceName] = undefined;
+        const { STAGING_RUBY_URL } = process.env;
+        const res = await axios.delete(STAGING_RUBY_URL, { headers });
+        const { status, data } = res;
+        this.logger.warn(
+          `Delete Instance from Ruby status : "${status}" Data : "${JSON.stringify(
+            data,
+          )}"`,
+        );
       } catch {}
 
       try {
         this.cleaningUp(instanceName);
       } finally {
-        try {
-          const { STAGING_RUBY_URL } = process.env;
-          const res = await axios.delete(STAGING_RUBY_URL, { headers });
-          const { status, data } = res;
-          this.logger.warn(
-            `Delete Instance from Ruby status : "${status}" Data : "${JSON.stringify(
-              data,
-            )}"`,
-          );
-        } catch (error) {
-          this.logger.warn('Get Error on Ruby API!!!');
-        }
-
         this.logger.warn(`Instance "${instanceName}" - REMOVED`);
       }
     });
