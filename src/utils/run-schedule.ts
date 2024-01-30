@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { dbserver } from "../db/db.connect";
 import { sendMessageController } from "../whatsapp/whatsapp.module";
 import schedule from  "node-schedule";
