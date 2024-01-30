@@ -1,6 +1,14 @@
-# First stage: compile things.
-FROM node:20-alpine AS build
-RUN apk add --no-cache git
+### BASE IMAGE
+FROM node:18-bullseye-slim AS base
+
+RUN apt update -y
+RUN apt upgrade -y
+RUN apt install -y git
+RUN npm install -g npm`
+
+### BUILD IMAGE
+FROM base AS builder
+
 WORKDIR /codechat
 
 # (Install OS dependencies; include -dev packages if needed.)

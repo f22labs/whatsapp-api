@@ -308,10 +308,14 @@ export class WAStartupService {
           statusCode: DisconnectReason.badSession,
         });
 
-        this.sendDataWebhook(Events.CONNECTION_UPDATE, {
-          instance: this.instance.name,
+        this.stateConnection = {
           state: 'refused',
           statusReason: DisconnectReason.connectionClosed,
+        };
+
+        this.sendDataWebhook(Events.CONNECTION_UPDATE, {
+          instance: this.instance.name,
+          ...this.stateConnection,
         });
 
         this.sendDataWebhook(Events.STATUS_INSTANCE, {
@@ -690,7 +694,7 @@ export class WAStartupService {
           message: { ...received.message },
           messageTimestamp: received.messageTimestamp as number,
           owner: this.instance.wuid,
-          source: getDevice(received.key.id),
+          source: getDevice(received.key.id) as any,
         });
 
         this.logger.log(received);
