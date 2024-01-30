@@ -32,7 +32,7 @@ export async function deliverMessage(id, incomingVersion) {
         { instanceName: "test" },
         {
           textMessage: { text: message },
-          number: '919363666912',
+          number: receiver,
           options: { delay: 1200 },
         }
       );
