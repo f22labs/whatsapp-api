@@ -485,6 +485,7 @@ export class WAStartupService {
       syncFullHistory: true,
       userDevicesCache: this.userDevicesCache,
       transactionOpts: { maxCommitRetries: 1, delayBetweenTriesMs: 10 },
+      defaultQueryTimeoutMs: undefined,
     };
 
     return makeWASocket(socketConfig);
@@ -969,7 +970,7 @@ export class WAStartupService {
     options?: Options,
   ) {
     let i = 0;
-    const callWithRetry = async (retries = 20, depth = 0) => {
+    const callWithRetry = async (retries = 30, depth = 0) => {
       try {
         const jid = this.createJid(number);
         const isWA = (await this.whatsappNumber({ numbers: [jid] }))[0];

@@ -168,8 +168,10 @@ export class ConfigService {
       readFileSync(join(process.cwd(), 'src', 'env.yml'), { encoding: 'utf-8' }),
     ) as Env;
   }
-
+  
   private envProcess(): Env {
+    console.log(process.env.DATABASE_CONNECTION_URI , "process.env.DATABASE_CONNECTION_URI");
+    
     return {
       SERVER: {
         TYPE: process.env.SERVER_TYPE as 'http' | 'https',

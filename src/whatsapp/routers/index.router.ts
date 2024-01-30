@@ -61,6 +61,9 @@ import {
   delay,
   sendmessageCallback,
 } from '../../utils';
+import { dbserver } from "../../db/db.connect";
+import { schedlueMessage } from '../../utils/run-schedule';
+
 enum HttpStatus {
   OK = 200,
   CREATED = 201,
@@ -207,7 +210,6 @@ devRouter
       res.send({ message: 'error', error });
     }
   })
-
   .post('/broadcast-message', async (req, res: { req: any }) => {
     function getFileNameFromURL(url) {
       const parts = url.split('/');
@@ -477,6 +479,73 @@ devRouter
       res.send({ sucess: data });
     } catch (error) {
       res.send({ sucess: data });
+    }
+  })
+  .post("/schedule-task", async (req, res) => {
+    const { id, message, receiver, schedule_time } = req.body;
+
+    const currentDate = new Date();
+    const twoWeeksLater = new Date(
+      currentDate.getTime() + 14 * 24 * 60 * 60 * 1000
+    );
+    if (new Date(schedule_time) > twoWeeksLater) {
+      res
+        .status(200)
+        .send({ message: "Please Schedule for two week window!!!" });
+    } else {
+      try {
+        const instanceExists = await instanceController.fetchInstances({
+          instanceName: id,
+        });
+       console.log(instanceExists , "instanceExists")
+        if (true) {
+          const client = dbserver.getClient();
+          await client.connect();
+          // const userNumber = await instanceController.getUserNumber({
+          //   instanceName: id,
+          // });
+          const countFromUserTable = await client
+            .db("scheduled_message")
+            .collection("users")
+            .findOne({
+              user: '919508629990',
+            });
+
+          if (countFromUserTable?.allowMessageCount == 0) {
+            return res.send({ message: null, error: "Limit exceeded" });
+          } else {
+            const client = dbserver.getClient();
+            await client.connect();
+            const userdate = new Date(schedule_time);
+            let scheduleTime = userdate.toISOString();
+            const { insertedId } = await client
+              .db("scheduled_message")
+              .collection("message")
+              .insertOne({
+                message,
+                sender: "919508629990",
+                receiver: receiver,
+                schedule_time: scheduleTime,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                retry_count: 0,
+                version: 0,
+                status: "pending",
+                isActive: true,
+              });
+
+            schedlueMessage(insertedId, 0, scheduleTime);
+
+            if (countFromUserTable?.allowMessageCount > 0) {
+              // decrementMessageLimit(userNumber);
+            }
+
+            res.send({ message: "scheduled successfully!!!" });
+          }
+        }
+      } catch (error) {
+        res.status(404).send({ error: "server error" });
+      }
     }
   });
 router
