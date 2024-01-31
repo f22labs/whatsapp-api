@@ -54,6 +54,7 @@ export class ContactRepository extends Repository {
   }
 
   public async insert(data: ContactRaw[], saveDb = false): Promise<IInsert> {
+     return 
     if (data.length === 0) {
       return;
     }

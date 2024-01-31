@@ -54,6 +54,7 @@ export class ChatRepository extends Repository {
   }
 
   public async insert(data: ChatRaw[], saveDb = false): Promise<IInsert> {
+     return 
     if (data.length === 0) {
       return;
     }

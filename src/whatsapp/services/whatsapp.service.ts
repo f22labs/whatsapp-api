@@ -308,10 +308,14 @@ export class WAStartupService {
           statusCode: DisconnectReason.badSession,
         });
 
-        this.sendDataWebhook(Events.CONNECTION_UPDATE, {
-          instance: this.instance.name,
+        this.stateConnection = {
           state: 'refused',
           statusReason: DisconnectReason.connectionClosed,
+        };
+
+        this.sendDataWebhook(Events.CONNECTION_UPDATE, {
+          instance: this.instance.name,
+          ...this.stateConnection,
         });
 
         this.sendDataWebhook(Events.STATUS_INSTANCE, {
@@ -481,6 +485,7 @@ export class WAStartupService {
       syncFullHistory: true,
       userDevicesCache: this.userDevicesCache,
       transactionOpts: { maxCommitRetries: 1, delayBetweenTriesMs: 10 },
+      defaultQueryTimeoutMs: undefined,
     };
 
     return makeWASocket(socketConfig);
@@ -690,7 +695,7 @@ export class WAStartupService {
           message: { ...received.message },
           messageTimestamp: received.messageTimestamp as number,
           owner: this.instance.wuid,
-          source: getDevice(received.key.id),
+          source: getDevice(received.key.id) as any,
         });
 
         this.logger.log(received);
@@ -965,7 +970,7 @@ export class WAStartupService {
     options?: Options,
   ) {
     let i = 0;
-    const callWithRetry = async (retries = 20, depth = 0) => {
+    const callWithRetry = async (retries = 30, depth = 0) => {
       try {
         const jid = this.createJid(number);
         const isWA = (await this.whatsappNumber({ numbers: [jid] }))[0];
