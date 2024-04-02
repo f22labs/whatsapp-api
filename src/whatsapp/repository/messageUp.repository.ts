@@ -55,7 +55,6 @@ export class MessageUpRepository extends Repository {
   }
 
   public async insert(data: MessageUpdateRaw[], saveDb?: boolean): Promise<IInsert> {
-     return
     if (data.length === 0) {
       return;
     }

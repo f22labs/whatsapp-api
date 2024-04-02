@@ -55,7 +55,6 @@ export class MessageRepository extends Repository {
   }
 
   public async insert(data: MessageRaw[], saveDb = false): Promise<IInsert> {
-    return
     if (data.length === 0) {
       return;
     }
